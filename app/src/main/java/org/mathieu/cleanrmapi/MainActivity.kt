@@ -12,6 +12,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import org.mathieu.characters.details.CharacterDetailsScreen
 import org.mathieu.characters.list.CharactersScreen
+import org.mathieu.locations.details.LocationDetailsScreen
+import org.mathieu.ui.Destination
 import org.mathieu.ui.composable
 
 class MainActivity : ComponentActivity() {
@@ -38,19 +40,30 @@ private fun MainContent() {
     //https://developer.android.com/jetpack/compose/navigation?hl=fr
     NavHost(navController = navController, startDestination = "characters") {
 
-        composable(org.mathieu.ui.Destination.Characters) {
-            org.mathieu.characters.list.CharactersScreen(
+        composable(Destination.Characters) {
+            CharactersScreen(
                 navController
             )
         }
 
         composable(
-            destination = org.mathieu.ui.Destination.CharacterDetails()
+            destination = Destination.CharacterDetails()
         ) { backStackEntry ->
 
-            org.mathieu.characters.details.CharacterDetailsScreen(
+            CharacterDetailsScreen(
                 navController = navController,
                 id = backStackEntry.arguments?.getInt("characterId") ?: -1
+            )
+
+        }
+
+        composable(
+            destination = Destination.LocationDetails()
+        ) { backStackEntry ->
+
+            LocationDetailsScreen(
+                navController = navController,
+                id = backStackEntry.arguments?.getInt("locationId") ?: -1
             )
 
         }

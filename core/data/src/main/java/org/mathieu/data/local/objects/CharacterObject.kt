@@ -4,7 +4,9 @@ import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import org.mathieu.data.remote.responses.CharacterResponse
 import org.mathieu.data.repositories.tryOrNull
-import org.mathieu.domain.models.character.*
+import org.mathieu.domain.models.character.Character
+import org.mathieu.domain.models.character.CharacterGender
+import org.mathieu.domain.models.character.CharacterStatus
 
 /**
  * Represents a character entity stored in the SQLite database. This object provides fields

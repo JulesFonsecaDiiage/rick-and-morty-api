@@ -22,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -41,7 +42,12 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.SubcomposeAsyncImage
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.collect
+import org.mathieu.ui.Destination
+import org.mathieu.ui.composables.LocationCard
 import org.mathieu.ui.composables.PreviewContent
+import org.mathieu.ui.navigate
 
 private typealias UIState = CharacterDetailsState
 
@@ -55,9 +61,18 @@ fun CharacterDetailsScreen(
 
     viewModel.init(characterId = id)
 
+    LaunchedEffect(viewModel) {
+        viewModel.events
+            .onEach { event ->
+                if (event is Destination.LocationDetails)
+                    navController.navigate(destination = event)
+            }.collect()
+    }
+
     CharacterDetailsContent(
         state = state,
-        onClickBack = navController::popBackStack
+        onClickBack = navController::popBackStack,
+        onAction = viewModel::handleAction
     )
 
 }
@@ -67,7 +82,8 @@ fun CharacterDetailsScreen(
 @Composable
 private fun CharacterDetailsContent(
     state: UIState = UIState(),
-    onClickBack: () -> Unit = { }
+    onClickBack: () -> Unit = { },
+    onAction: (CharacterDetailsAction) -> Unit = { }
 ) = Scaffold(topBar = {
 
     Row(
@@ -135,8 +151,6 @@ private fun CharacterDetailsContent(
                                 )
                             )
                     )
-
-
                 }
 
                 Column(
@@ -155,6 +169,23 @@ private fun CharacterDetailsContent(
                     Spacer(modifier = Modifier.height(12.dp))
 
                     Text(text = state.name)
+
+                    // Card with details information
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    if (state.location != null) {
+                        Spacer(modifier = Modifier.height(24.dp))
+                        Text(
+                            text = "Location",
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        LocationCard(
+                            location = state.location,
+                            onClick = {
+                                onAction(CharacterDetailsAction.NavigateToLocation(state.location.id))
+                            }
+                        )
+                    }
                 }
 
 
@@ -162,7 +193,6 @@ private fun CharacterDetailsContent(
         }
     }
 }
-
 
 @Preview
 @Composable
